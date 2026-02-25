@@ -2,6 +2,9 @@
 
 Browse [Hacker News](https://news.ycombinator.com) from inside Neovim.
 
+![](https://github.com/user-attachments/assets/377c1a37-e794-492c-9f97-11e6ae53d988)
+![](https://github.com/user-attachments/assets/9345df72-34db-4ec5-996c-1ca854bdd7c2)
+
 ## Features
 
 - Browse the front page and other pages (New, Ask, Show, Jobs, Past)
