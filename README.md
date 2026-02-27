@@ -16,7 +16,7 @@ Browse [Hacker News](https://news.ycombinator.com) from inside Neovim.
 
 ## Requirements
 
-- Neovim 0.10+ recommended (0.9+ works with limited functionality)
+- Neovim 0.10+ recommended (not tested on previous versions)
 - `curl`
 
 ## Installation
@@ -26,6 +26,7 @@ Browse [Hacker News](https://news.ycombinator.com) from inside Neovim.
 ```lua
 {
   "forked4x/hackernews.nvim",
+  opts = {}, -- optional
 }
 ```
 
@@ -33,6 +34,33 @@ Browse [Hacker News](https://news.ycombinator.com) from inside Neovim.
 
 ```lua
 MiniDeps.add("forked4x/hackernews.nvim")
+require("hackernews"):setup({}) -- optional
+```
+
+## Configuration
+
+`setup()` is optional. The plugin works out of the box with sensible defaults. Call it only if you want to customize keymaps or text width.
+
+With lazy.nvim, `setup()` is called automatically when `opts` is provided.
+
+```lua
+-- Default configuration (all optional)
+require("hackernews").setup({
+  keymaps = {
+    open = "o",
+    open_in_browser = "O",
+    close = "q",
+    next_comment = "]]",
+    prev_comment = "[[",
+    next_sibling = "]=",
+    prev_sibling = "[=",
+    next_parent = "]-",
+    prev_parent = "[-",
+    next_root = "]0",
+    prev_root = "[0",
+  },
+  textwidth = 88,  -- set to 0 to use full window width
+})
 ```
 
 ## Usage
@@ -54,7 +82,12 @@ These mappings are set in HackerNews buffers:
 | Key | Action |
 |-----|--------|
 | `o` | Open story link in browser, or navigate to comments |
+| `O` | Open in browser (story URL or HN comment link) |
 | `q` | Close the buffer |
+| `]]` / `[[` | Next/previous comment |
+| `]=` / `[=` | Next/previous sibling comment |
+| `]-` / `[-` | Next/previous parent comment |
+| `]0` / `[0` | Next/previous root comment |
 | `zc` / `zo` | Fold/unfold comment threads |
 
 ## Highlight Groups

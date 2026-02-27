@@ -4,6 +4,35 @@ local ui = require("hackernews.ui")
 
 local M = {}
 
+M.config = {
+  keymaps = {
+    open = "o",
+    open_in_browser = "O",
+    close = "q",
+    next_comment = "]]",
+    prev_comment = "[[",
+    next_sibling = "]=",
+    prev_sibling = "[=",
+    next_parent = "]-",
+    prev_parent = "[-",
+    next_root = "]0",
+    prev_root = "[0",
+  },
+  textwidth = 88,
+}
+
+function M.setup(opts)
+  opts = opts or {}
+  if opts.keymaps then
+    for k, v in pairs(opts.keymaps) do
+      M.config.keymaps[k] = v
+    end
+  end
+  if opts.textwidth ~= nil then
+    M.config.textwidth = opts.textwidth
+  end
+end
+
 local base_url = "https://news.ycombinator.com"
 
 local page_paths = {
