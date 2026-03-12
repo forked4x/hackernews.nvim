@@ -34,8 +34,11 @@ syn match hnTitleLine /^ \?\d\+\..\+$/ contains=hnRank,hnDomain,hnConcealed
 " Frontpage: subtitle line (4-space indent, ends with [item_id])
 syn match hnSubtitle /^    \S.\+\[\d\+\]$/ contains=hnConcealed
 
+" Comments: chevron prefix on info lines
+syn match hnChevron /^\(> \)\+/ contained
+
 " Comments: info/header line (ends with [item_id] {{{)
-syn match hnCommentInfo /^.\+\[\d\+\] {{{$/ contains=hnConcealed
+syn match hnCommentInfo /^.\+\[\d\+\] {{{$/ contains=hnChevron,hnConcealed
 
 " Comments: story header title (no rank prefix, ends with concealed URL)
 syn match hnStoryHeader /^\%(\d\+\. \)\@!\S.\+\[https\?:\/\/.\+\]$/ contains=hnDomain,hnConcealed
@@ -52,5 +55,6 @@ hi def link hnDomain Comment
 hi def link hnSubtitle Comment
 hi def link hnStorySubtitle Comment
 hi def link hnCommentInfo Comment
+hi def link hnChevron Conceal
 
 let b:current_syntax = 'hackernews'

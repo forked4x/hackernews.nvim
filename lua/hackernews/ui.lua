@@ -92,8 +92,10 @@ end
 --- Get indent level of a comment header line, or nil if not a header
 local function get_comment_indent(line)
   if not line:match("%[%d+%] {{{$") then return nil end
-  local prefix = line:match("^(%s*)")
-  return #prefix / 2
+  local prefix = line:match("^([> ]*)")
+  local count = 0
+  for _ in prefix:gmatch("> ") do count = count + 1 end
+  return count
 end
 
 --- Navigate between comments in a comment buffer
@@ -434,8 +436,8 @@ local function reapply_op_highlights(buf, lines)
 
   for idx, line in ipairs(lines) do
     if line:match("%[%d+%] {{{$") then
-      local prefix = line:match("^(%s*)")
-      local user = line:match("^%s*(%S+)")
+      local prefix = line:match("^([> ]*)")
+      local user = line:sub(#prefix + 1):match("^(%S+)")
       if user == op_user then
         vim.api.nvim_buf_set_extmark(buf, ns, idx - 1, #prefix, {
           end_col = #prefix + #user,
@@ -497,10 +499,11 @@ function M.render_comments(buf, comments, header)
   end
 
   for i, comment in ipairs(comments) do
-    local prefix = string.rep("  ", comment.indent)
+    local chevron_prefix = string.rep("> ", comment.indent)
+    local body_prefix = string.rep("  ", comment.indent)
 
     -- Info line: "prefix user time_ago [item_id] {{{" (fold open marker)
-    local info_line = prefix .. comment.user .. " " .. comment.time_ago
+    local info_line = chevron_prefix .. comment.user .. " " .. comment.time_ago
     if comment.id ~= "" then
       info_line = info_line .. " [" .. comment.id .. "]"
     end
@@ -509,12 +512,12 @@ function M.render_comments(buf, comments, header)
     table.insert(lines, info_line)
 
     -- Content lines (word-wrapped)
-    local max_width = tw - #prefix
+    local max_width = tw - #body_prefix
     local paragraphs = vim.split(comment.text, "\n", { plain = true })
     for _, paragraph in ipairs(paragraphs) do
       local wrapped = wrap_text(paragraph, max_width)
       for _, wl in ipairs(wrapped) do
-        table.insert(lines, prefix .. wl)
+        table.insert(lines, body_prefix .. wl)
       end
     end
 
@@ -631,7 +634,10 @@ local function rewrap_comment_buffer(buf, tw)
     if line:match("%[%d+%] {{{$") then
       -- Comment header — keep as-is
       table.insert(new_lines, line)
-      local prefix = line:match("^(%s*)")
+      local prefix = line:match("^([> ]*)")
+      local indent_level = 0
+      for _ in prefix:gmatch("> ") do indent_level = indent_level + 1 end
+      local body_prefix = string.rep("  ", indent_level)
       i = i + 1
 
       -- Collect body lines until inter-comment separator
@@ -663,8 +669,8 @@ local function rewrap_comment_buffer(buf, tw)
       local stripped = {}
       for _, bl in ipairs(body) do
         local content = bl
-        if #prefix > 0 and bl:sub(1, #prefix) == prefix then
-          content = bl:sub(#prefix + 1)
+        if #body_prefix > 0 and bl:sub(1, #body_prefix) == body_prefix then
+          content = bl:sub(#body_prefix + 1)
         end
         table.insert(stripped, content)
       end
@@ -673,14 +679,14 @@ local function rewrap_comment_buffer(buf, tw)
       local paragraphs = unwrap_paragraphs(stripped)
 
       -- Re-wrap
-      local max_w = tw - #prefix
+      local max_w = tw - #body_prefix
       local rewrapped = {}
       for _, p in ipairs(paragraphs) do
         if p == "" then
-          table.insert(rewrapped, prefix)
+          table.insert(rewrapped, body_prefix)
         else
           for _, wl in ipairs(wrap_text(p, max_w)) do
-            table.insert(rewrapped, prefix .. wl)
+            table.insert(rewrapped, body_prefix .. wl)
           end
         end
       end

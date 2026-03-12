@@ -105,6 +105,7 @@ All highlight groups can be overridden in your colorscheme or config.
 | `hnSubtitle` | Story metadata line on front page | links to `Comment` |
 | `hnStorySubtitle` | Story metadata line in comment view | links to `Comment` |
 | `hnCommentInfo` | Comment author/time header | links to `Comment` |
+| `hnChevron` | Chevron (`>`) prefix on comment lines | links to `Conceal` |
 | `hnItalic` | `<i>` text in comments | `gui=italic` |
 | `hnBold` | `<b>` text in comments | `gui=bold` |
 | `hnUnderline` | `<u>` text in comments | `gui=underline` |
